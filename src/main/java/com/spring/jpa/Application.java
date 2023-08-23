@@ -1,13 +1,16 @@
 package com.spring.jpa;
 
+import com.github.javafaker.Faker;
 import com.spring.jpa.entity.Student;
+import com.spring.jpa.entity.StudentIdCard;
+import com.spring.jpa.repository.StudentIdCardRepository;
 import com.spring.jpa.repository.StudentRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.util.List;
+import java.util.Optional;
 
 @SpringBootApplication
 public class Application {
@@ -17,44 +20,48 @@ public class Application {
     }
 
     @Bean
-    CommandLineRunner commandLineRunner(StudentRepository studentRepository) {
+    CommandLineRunner commandLineRunner(StudentRepository studentRepository,
+                                        StudentIdCardRepository idCardRepository) {
         return args -> {
-            Student moeen = new Student(
-                    "Moeen",
-                    "Ahmmed",
-                    "moeen@gmail.com",
-                    25);
+            //generateRandomStudent(studentRepository);
+            Faker faker = new Faker();
+            String firstName = faker.name().firstName();
+            String lastName = faker.name().lastName();
+            String email = String.format("%s.%s@gmail.com", firstName, lastName);
 
-            Student maria = new Student(
-                    "Maria",
-                    "Ahmmed",
-                    "maria@gmail.com",
-                    25);
-            System.out.println("Saving Student list");
-            studentRepository.saveAll(List.of(moeen, maria));
-
-            System.out.println("Counting Number of Student in database");
-            System.out.println(studentRepository.count());
-
-            studentRepository
-                    .findById(2L)
-                    .ifPresentOrElse(System.out::println,
-                            () -> System.out.println("Student is not present with ID 2"));
-
-            studentRepository
-                    .findById(3L)
-                    .ifPresentOrElse(System.out::println,
-                            () -> System.out.println("Student is not present with ID 3"));
-
-            List<Student> studentList = studentRepository.findAll();
-            studentList.forEach(System.out::println);
-
-            studentRepository.deleteById(1L);
-
-            System.out.println(studentRepository.count());
-
-            studentRepository.findStudentByEmail("moeen@gmail.com").ifPresentOrElse(System.out::println,
-                    () -> System.out.println("Student is not present with ID 3"));
+            Student student = new Student(
+                    firstName,
+                    lastName,
+                    email,
+                    faker.number().numberBetween(17, 25));
+            StudentIdCard studentIdCard = new StudentIdCard("12345678", student);
+            idCardRepository.save(studentIdCard);
+            System.out.println("$$$$$$$$$$$$Student$$$$$$$$$$$$$ ");
+            studentRepository.findById(1L)
+                    .ifPresentOrElse(System.out::println, () ->
+                            System.out.println("Student iis not exit"));
+            System.out.println("$$$$$$$$$$$$ID-CARD$$$$$$$$$$$$$ ");
+            idCardRepository.findById(1L)
+                    .ifPresentOrElse(System.out::println, () ->
+                            System.out.println("Student iis not exit"));
         };
     }
+
+    private void generateRandomStudent(StudentRepository studentRepository) {
+        Faker faker = new Faker();
+
+        for (int i = 0; i < 20; i++) {
+            String firstName = faker.name().firstName();
+            String lastName = faker.name().lastName();
+            String email = String.format("%s.%s@gmail.com", firstName, lastName);
+
+            Student student = new Student(
+                    firstName,
+                    lastName,
+                    email,
+                    faker.number().numberBetween(17, 25));
+            studentRepository.save(student);
+        }
+    }
+
 }
