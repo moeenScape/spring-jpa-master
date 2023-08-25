@@ -32,7 +32,8 @@ public class Student implements Serializable {
 
     @Column(name = "email",
             updatable = false,
-            columnDefinition = "TEXT")
+            length = 100,
+            columnDefinition = "VARCHAR(100)")
     private String email;
 
     @Column(name = "age",
@@ -42,7 +43,7 @@ public class Student implements Serializable {
     public Student() {
     }
 
-    public Student( String firstName, String lastName, String email, int age) {
+    public Student(String firstName, String lastName, String email, int age) {
         this.firstName = firstName;
         LastName = lastName;
         this.email = email;
@@ -87,5 +88,16 @@ public class Student implements Serializable {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", LastName='" + LastName + '\'' +
+                ", email='" + email + '\'' +
+                ", age=" + age +
+                '}';
     }
 }
