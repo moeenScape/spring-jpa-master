@@ -1,5 +1,6 @@
 package com.spring.jpa;
 
+import com.github.javafaker.Faker;
 import com.spring.jpa.entity.Student;
 import com.spring.jpa.repository.StudentRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -7,6 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import javax.sound.midi.Soundbank;
 import java.util.List;
 
 @SpringBootApplication
@@ -19,42 +21,61 @@ public class Application {
     @Bean
     CommandLineRunner commandLineRunner(StudentRepository studentRepository) {
         return args -> {
-            Student moeen = new Student(
-                    "Moeen",
-                    "Ahmmed",
-                    "moeen@gmail.com",
-                    25);
+            Faker faker = new Faker();
 
-            Student maria = new Student(
-                    "Maria",
-                    "Ahmmed",
-                    "maria@gmail.com",
-                    25);
-            System.out.println("Saving Student list");
-            studentRepository.saveAll(List.of(moeen, maria));
+            for (int i = 0; i < 20; i++) {
+                String firstName = faker.name().firstName();
+                String lastName = faker.name().lastName();
+                String email = String.format("%s.%s@gmail.com", firstName, lastName);
 
-            System.out.println("Counting Number of Student in database");
-            System.out.println(studentRepository.count());
+                Student student = new Student(
+                        firstName,
+                        lastName,
+                        email,
+                        faker.number().numberBetween(17, 25));
+                studentRepository.save(student);
+            }
+            System.out.println("***********************************************************");
+            System.out.println("Student List : ");
+            studentRepository.findAll()
+                    .forEach(System.out::println);
 
-            studentRepository
-                    .findById(2L)
-                    .ifPresentOrElse(System.out::println,
-                            () -> System.out.println("Student is not present with ID 2"));
+            System.out.println("***********************************************************");
+            System.out.println("finding Student by email");
+            studentRepository.findStudentByEmail("moeen@gmail.com")
+                    .ifPresentOrElse(System.out::println, () ->
+                            System.out.println("Student not fount with given email"));
 
-            studentRepository
-                    .findById(3L)
-                    .ifPresentOrElse(System.out::println,
-                            () -> System.out.println("Student is not present with ID 3"));
+            System.out.println("***********************************************************");
+            System.out.println("Use distinct Keyword ");
+            studentRepository.findDistinctByLastNameAndFirstName("Moeen", "Ahmmed")
+                    .forEach(System.out::println);
 
-            List<Student> studentList = studentRepository.findAll();
-            studentList.forEach(System.out::println);
+            System.out.println("***********************************************************");
+            System.out.println("User AND keyword");
+            studentRepository.findStudentByFirstNameAndLastName("Moeen", "Ahmmed")
+                    .forEach(System.out::println);
 
-            studentRepository.deleteById(1L);
+            System.out.println("***********************************************************");
+            System.out.println("User OR keyword");
+            studentRepository.findStudentByFirstNameOrLastName("Moeen", "Ahmmed")
+                    .forEach(System.out::println);
 
-            System.out.println(studentRepository.count());
+            System.out.println("***********************************************************");
+            System.out.println("Between Keyword");
+            studentRepository.findStudentByAgeBetween(17, 30)
+                    .forEach(System.out::println);
 
-            studentRepository.findStudentByEmail("moeen@gmail.com").ifPresentOrElse(System.out::println,
-                    () -> System.out.println("Student is not present with ID 3"));
+            System.out.println("***********************************************************");
+            System.out.println("Delete by Id ");
+            studentRepository.deleteStudentById(1L);
+
+            System.out.println("***********************************************************");
+            System.out.println("Check Student if delete work or not");
+            studentRepository.findById(1L).ifPresentOrElse(System.out::println,()->{
+                System.out.println("Student was deleted");
+            });
+
         };
     }
 }

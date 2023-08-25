@@ -28,11 +28,12 @@ public class Student implements Serializable {
     @Column(name = "last_name",
             updatable = false,
             columnDefinition = "TEXT")
-    private String LastName;
+    private String lastName;
 
     @Column(name = "email",
             updatable = false,
-            columnDefinition = "TEXT")
+            length = 100,
+            columnDefinition = "VARCHAR(100)")
     private String email;
 
     @Column(name = "age",
@@ -42,9 +43,9 @@ public class Student implements Serializable {
     public Student() {
     }
 
-    public Student( String firstName, String lastName, String email, int age) {
+    public Student(String firstName, String lastName, String email, int age) {
         this.firstName = firstName;
-        LastName = lastName;
+        this.lastName = lastName;
         this.email = email;
         this.age = age;
     }
@@ -66,11 +67,11 @@ public class Student implements Serializable {
     }
 
     public String getLastName() {
-        return LastName;
+        return lastName;
     }
 
     public void setLastName(String lastName) {
-        LastName = lastName;
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -87,5 +88,16 @@ public class Student implements Serializable {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", LastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", age=" + age +
+                '}';
     }
 }
