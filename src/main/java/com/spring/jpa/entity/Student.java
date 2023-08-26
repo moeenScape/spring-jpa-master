@@ -3,6 +3,8 @@ package com.spring.jpa.entity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import static jakarta.persistence.GenerationType.SEQUENCE;
 
@@ -54,9 +56,19 @@ public class Student implements Serializable {
     private Integer age;
     @OneToOne(
             mappedBy = "student",
-            orphanRemoval = true
+            orphanRemoval = true,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
     )
     private StudentIdCard studentIdCard;
+
+    @OneToMany(
+            mappedBy = "student",
+            orphanRemoval = true,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            fetch = FetchType.EAGER
+    )
+    private List<Book> books = new ArrayList<>();
+
     public Student() {
     }
 
@@ -76,6 +88,36 @@ public class Student implements Serializable {
                 ", email='" + email + '\'' +
                 ", age=" + age +
                 '}';
+    }
+
+    public void addBook(Book book) {
+        if (!this.books.contains(book)) {
+            this.books.add(book);
+            book.setStudent(this);
+        }
+    }
+
+    public void removeBook(Book book) {
+        if (this.books.contains(book)) {
+            this.books.remove(book);
+            book.setStudent(null);
+        }
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public StudentIdCard getStudentIdCard() {
+        return studentIdCard;
+    }
+
+    public void setStudentIdCard(StudentIdCard studentIdCard) {
+        this.studentIdCard = studentIdCard;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
     }
 
     public Long getId() {
@@ -117,6 +159,4 @@ public class Student implements Serializable {
     public void setAge(Integer age) {
         this.age = age;
     }
-
-
 }
