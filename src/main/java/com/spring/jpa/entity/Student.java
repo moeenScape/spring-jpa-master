@@ -69,6 +69,22 @@ public class Student implements Serializable {
     )
     private List<Book> books = new ArrayList<>();
 
+    @ManyToMany(
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
+    @JoinTable(
+            name = "enrollment",
+            joinColumns = @JoinColumn(
+                    name = "student_id",
+                    foreignKey = @ForeignKey(name = "enrollment_student_id_fk")
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "course_id",
+                    foreignKey = @ForeignKey(name = "enrollment_course_id_fk")
+            )
+    )
+    private List<Course> courses = new ArrayList<>();
+
     public Student() {
     }
 
@@ -88,6 +104,20 @@ public class Student implements Serializable {
                 ", email='" + email + '\'' +
                 ", age=" + age +
                 '}';
+    }
+
+    public List<Course> getCourses() {
+        return courses;
+    }
+
+    public void enrolledCourse(Course course) {
+        courses.add(course);
+        course.getStudents().add(this);
+    }
+
+    public void unEnrolledCourse(Course course){
+        courses.remove(course);
+        course.getStudents().remove(this);
     }
 
     public void addBook(Book book) {
