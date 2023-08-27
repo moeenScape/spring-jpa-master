@@ -30,3 +30,6 @@
 | True             | findByActiveTrue()             | ... where x.active = true |
 | False            | findByActiveFalse()            | ... where x.active = false |
 | IgnoreCase       | findByFirstnameIgnoreCase      | ... where UPPER(x.firstname) = UPPER(?1) |
+
+
+### This table from Spring JPA Docs
